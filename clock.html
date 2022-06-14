@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Clock</title>
+        <meta name="description" content="JS Project that represents a working clock">
+        <meta name="keywords" content="clock, project, portfolio">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="dominz2005">
+        <link rel="icon" href="icons/clock.png">
+        <style>
+            body
+            {
+                margin: 0;
+                padding: 0;
+                background-color: #8a2be2;
+                font-family: 'Segoe UI';
+            }
+            main
+            {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 40vw;
+                height: 40vw;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                background-color: #25283d;
+                border: 25px solid #000;
+                border-radius: 50%;
+            }
+            main .hands
+            {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            main .hands::after
+            {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                height: 3vw;
+                width: 3vw;
+                background-color: #c7d8f8;
+                border-radius: 50%;
+            }
+            main .hands div
+            {
+                position: absolute;
+                transform-origin: bottom;
+                transform: rotate(var(--rotation));
+            }
+            main .hands .hour
+            {
+                bottom: 0;
+                left: calc(-2vw / 2);
+                height: 12vw;
+                width: 2vw;
+                background-color: #ffa500;
+            }
+            main .hands .minute
+            {
+                bottom: 0;
+                left: calc(-1.5vw / 2);
+                height: 14vw;
+                width: 1.5vw;
+                background-color: #808080;
+            }
+            main .hands .second
+            {
+                bottom: 0;
+                left: calc(-1vw / 2);
+                height: 16vw;
+                width: 1vw;
+                background-color: #fd0000;
+            }
+            
+            main .numbers
+            {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                height: 100%;
+                width: 100%;
+                transform: translate(-50%, -50%);
+            }
+            main .numbers div
+            {
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%) rotate(var(--rotation));
+                height: 100%;
+            }
+            main .numbers div p
+            {
+                margin: 0;
+                padding: 5px;
+                transform: rotate(var(--rotation));
+                font-size: 40px;
+                color: #FFF;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="hands">
+                <div class="hour"></div>
+                <div class="minute"></div>
+                <div class="second"></div>
+            </div>
+            <div class="numbers">
+                <div style="--rotation: 0deg"><p>12</p></div>
+                <div style="--rotation: 30deg"><p style="--rotation: -30deg">1</p></div>
+                <div style="--rotation: 60deg"><p style="--rotation: -60deg">2</p></div>
+                <div style="--rotation: 90deg"><p style="--rotation: -90deg">3</p></div>
+                <div style="--rotation: 120deg"><p style="--rotation: -120deg">4</p></div>
+                <div style="--rotation: 150deg"><p style="--rotation: -150deg">5</p></div>
+                <div style="--rotation: 180deg"><p style="--rotation: -180deg">6</p></div>
+                <div style="--rotation: 210deg"><p style="--rotation: -210deg">7</p></div>
+                <div style="--rotation: 240deg"><p style="--rotation: -240deg">8</p></div>
+                <div style="--rotation: 270deg"><p style="--rotation: -270deg">9</p></div>
+                <div style="--rotation: 300deg"><p style="--rotation: -300deg">10</p></div>
+                <div style="--rotation: 330deg"><p style="--rotation: -330deg">11</p></div>
+            </div>
+        </main>
+        <script>
+            // All DOM Elements
+            const hour = document.querySelector('.hour');
+            const minute = document.querySelector('.minute');
+            const second = document.querySelector('.second');
+
+            // Function for changing the rotation of the hands
+            function ChangeTime()
+            {
+                const date = new Date();
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const seconds = date.getSeconds();
+                
+                const hAxis = 30 * hours + (minutes * .5);
+                const mAxis = 6 * minutes + (seconds * .1);
+                const sAxis = 6 * seconds;
+
+                hour.style = `--rotation: ${hAxis}deg`;
+                minute.style = `--rotation: ${mAxis}deg`;
+                second.style = `--rotation: ${sAxis}deg`;
+            }
+
+            // Function for calling the ChangeTime function every second
+            ChangeTime();
+            setInterval(ChangeTime, 1000);
+        </script>
+    </body>
+</html>

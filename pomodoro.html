@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Pomodoro</title>
+        <meta name="description" content="JS Project that represents Pomodoro timer app">
+        <meta name="keywords" content="pomodoro, timer, project, portfolio">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="dominz2005">
+        <link rel="icon" href="icons/pomodoro.png">
+        <style>
+            body
+            {
+                margin: 0;
+                padding: 0;
+                background-color: #30384b;
+                font-family: "Kumbh Sans", sans-serif;
+            }
+            main
+            {
+                margin-top: 50px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            main h1
+            {
+                text-align: center;
+                font-size: 50px;
+                color: #d6dffe;
+            }
+            main h1 div 
+            { 
+                cursor: pointer;
+                padding: 10px 0;
+                position: relative;
+                display: inline-block;
+                color: var(--main-color);
+            }
+            main h1 div ul
+            {
+                overflow: hidden;
+                margin: 0;
+                padding: 10px 0 0 0;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                z-index: 2;
+                height: 0;
+                width: 300px;
+                text-align: right;
+                transition: .3s;
+            }
+            main h1 div ul li
+            { 
+                list-style-type: none;
+                padding: 15px 0;
+                transition: .2s;
+            }
+            main h1 div ul li:hover { transform: translateX(-10px) }
+            main h1 div::after
+            { 
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 5px;
+                background-color: var(--main-color);
+                transition: .3s;
+            }
+            main h1 div:hover::after { width: 100% }
+            main h1 div:hover ul { height: 275px }
+            main > div
+            {
+                cursor: pointer;
+                margin-top: 50px;
+                position: relative;
+                height: 415px;
+                width: 415px;
+                border-radius: 50%;
+                box-shadow: -50px -50px 100px var(--first-shadow), 50px 50px 100px var(--second-shadow);
+                border-radius: 50%;
+                transition: .5s;
+            }
+            main > div:hover { box-shadow: -50px -50px 100px 25px var(--first-shadow), 50px 50px 100px 25px var(--second-shadow) }
+            main > div:hover p { color: #e3e9fd }
+            main > div p
+            {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                width: 255px;
+                letter-spacing: -5px;
+                font-size: 100px;
+                font-weight: 600;
+                color: #d6dffe;
+                transition: .1s;
+            }
+            main > div .hidden { display: none }
+            main > div .circles
+            {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+            main > div .circles svg
+            {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+            main > div .circles svg circle
+            {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform-origin: center;
+                transform: translate(125px, 125px) rotate(90deg) rotateY(180deg);
+                fill: none;
+                stroke-width: 15;
+                stroke-dasharray: 1260;
+                stroke-dashoffset: 1260;
+                transition: .2s;
+            }
+            main > div .circles svg circle:nth-child(1)
+            {
+                stroke-dashoffset: 0;
+                stroke: transparent;
+            }
+            main > div .circles svg circle:nth-child(2)
+            {
+                stroke-dashoffset: var(--percentage);
+                stroke: var(--main-color);
+            }
+        </style>
+    </head>
+    <body>
+        <main style="--main-color: #EE6055; --first-shadow: #EE60552e; --second-shadow: #EE605540;">
+            <h1>
+                It's time for 
+                <div>
+                    <span>pomodoro</span>
+                    <ul>
+                        <li value="pomodoro">pomodoro</li>
+                        <li value="shortBreak">short break</li>
+                        <li value="longBreak">long break</li>
+                    </ul>
+                </div>
+            </h1>
+            <div>
+                <div class="circles">
+                    <svg>
+                        <circle cx="200" cy="200" r="200"></circle>
+                        <circle cx="200" cy="200" r="200"></circle>
+                    </svg>
+                </div>
+                <p class="pomodoro">25:00</p>
+                <p class="shortBreak hidden">05:00</p>
+                <p class="longBreak hidden">15:00</p>
+            </div>
+        </main>
+        <script>
+            // DOM elements for timer div and the circle
+            const timer = document.querySelector("main > div");
+            let circle = timer.querySelector(".circles");
+
+            // DOM elements for the custom select
+            const switchText = document.querySelector("main h1 div");
+            switchText.addEventListener("mouseenter", () => timer.style.opacity = "0.2" );
+            switchText.addEventListener("mouseleave", () => timer.style.opacity = "1" );
+
+            // Variables for the max time of each timer
+            let currentTimer = "pomodoro";
+            let maxTime = {
+                pomodoro: 1500,
+                shortBreak: 300,
+                longBreak: 900
+            };
+
+            // Adding the event listener to the custom select
+            const options = switchText.querySelectorAll("ul li");
+            options.forEach(option => option.addEventListener("click", () => 
+            {
+                switchText.querySelector('span').innerText = option.innerText;
+
+                timer.querySelector(`.${currentTimer}`).classList.add("hidden");
+                currentTimer = option.getAttribute("value");
+
+                const time = timer.querySelector(`.${currentTimer}`);
+
+                const text = time.innerText.split(":");
+
+                const minutes = parseInt(text[0]);
+                const seconds = parseInt(text[1]);
+
+                time.classList.remove("hidden");
+                
+                const percentage = ((minutes * 60 + seconds) / maxTime[currentTimer]) * 100;
+                circle.style = `--percentage: ${1260 - (1260 * percentage) / 100};`;
+            }));
+
+            // Function for changing the look of the string
+            function BeutifyTime(time)
+            {
+                if(time < 10) return "0" + time;
+                return time;
+            }
+
+            // Function for changing the time of the timer
+            function StartTimer()
+            {
+                let time = timer.querySelector(`.${currentTimer}`);
+
+                const text = time.innerText.split(":");
+
+                let minutes = parseInt(text[0]);
+                let seconds = parseInt(text[1]);
+
+                let interval = setInterval(() =>
+                {
+                    seconds--;
+                    if(seconds < 0)
+                    {
+                        minutes--;
+                        seconds = 59;
+                    }
+                    if(minutes == 0)
+                        clearInterval(interval);
+
+                    const percentage = ((minutes * 60 + seconds) / maxTime[currentTimer]) * 100;
+
+                    time.innerText = `${BeutifyTime(minutes)}:${BeutifyTime(seconds)}`;
+                    circle.style = `--percentage: ${1260 - (1260 * percentage) / 100};`;
+                }, 1000);
+
+                return interval;
+            }
+            
+            // Function for stopping and starting the timer
+            let interval = undefined;
+            timer.addEventListener("click", () =>
+            {
+                if(interval == undefined)
+                    interval = StartTimer();
+                else
+                {
+                    clearInterval(interval);
+                    interval = undefined;
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Calculator</title>
+        <meta name="description" content="JS Project that represents a working calculator with a basic functionalities">
+        <meta name="keywords" content="calculator, project, portfolio">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="dominz2005">
+        <link rel="icon" href="icons/calculator.png">
+        <style>
+            body
+            {
+                margin: 0;
+                padding: 0;
+                background: linear-gradient(to right bottom, #F0CB35, #C02425);
+                background-attachment: fixed;
+                font-family: 'Segoe UI';
+            }
+            main
+            {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 450px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                background: linear-gradient(to right bottom, #FFE259, #FFA751);
+                border-radius: 15px;
+            }
+
+            main .display
+            {
+                position: relative;
+                margin-bottom: 10px;
+                padding-top: 50px;
+                height: 235px;
+                width: 100%;
+                background-color: hsla(34, 100%, 82%, 0.75);
+                border-radius: 15px 15px 0 0;
+            }
+            main .display::before
+            {
+                content: "Calculator";
+                position: absolute;
+                top: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 18px;
+                font-weight: 600;
+                color: #4D4D4D;
+            }
+            main .display::after
+            {
+                content: "";
+                position: absolute;
+                top: 35px;
+                left: 50%;
+                height: 1px;
+                width: 70px;
+                transform: translateX(-50%);
+                background-color: #707070;
+            }
+            main .display .operation
+            {
+                margin: 0;
+                margin-right: 20px;
+                text-align: right;
+                font-size: 20px;
+            }
+            main .display .number
+            {
+                margin: 0;
+                margin-right: 20px;
+                height: 150px;
+                word-wrap: break-word;
+                text-align: right;
+                font-size: 58px;
+            }
+
+            main .buttons
+            {
+                padding: 10px 3px;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+                gap: 3px;
+            }
+            main .buttons button
+            {
+                cursor: pointer;
+                padding: 0;
+                height: 85px;
+                font-size: 25px;
+                border: none;
+                transition: .1s ease-in-out;
+            }
+            main .buttons .double { grid-column: span 2 }
+            main .buttons button:hover { background-color: #dbdbdb}
+            main .buttons button:active { background-color: #d2d2d2 }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="display">
+                <p class="number">0</p>
+                <p class="operation"></p>
+            </div>
+            <div class="buttons">
+                <button class="number">7</button>
+                <button class="number">8</button>
+                <button class="number">9</button>
+                <button class="action">CE</button>
+                <button class="action">C</button>
+                <button class="number">4</button>
+                <button class="number">5</button>
+                <button class="number">6</button>
+                <button class="operative">*</button>
+                <button class="operative">+</button>
+                <button class="number">1</button>
+                <button class="number">2</button>
+                <button class="number">3</button>
+                <button class="operative">/</button>
+                <button class="operative">-</button>
+                <button class="number double">0</button>
+                <button class="separator">,</button>
+                <button class="submit double">=</button>
+            </div>
+        </main>
+        <script>
+            // Variables for the calculator
+            const operation = new Array();
+            let stringNumber = '';
+            let finished = false;
+
+            // All DOM Elements
+            const buttons = document.querySelector('.buttons');
+            const numbers = buttons.querySelectorAll('.number');
+            const operatives = buttons.querySelectorAll('.operative');
+            const actions = buttons.querySelectorAll('.action');
+            const separator = buttons.querySelector('.separator');
+
+            // All DOM Elements
+            const display = document.querySelector('.display');
+            const numberDisplay = display.querySelector('.number');
+            const operationDisplay = display.querySelector('.operation');
+
+            // Event Listeners for the numeric buttons of the calculator
+            numbers.forEach(number => 
+            {
+                number.addEventListener('click', () => 
+                {
+                    if(stringNumber.length >= 16) return;
+
+                    if(finished)
+                    {
+                        stringNumber = '';
+                        operation.splice(0, operation.length);
+                        finished = false;
+                        
+                        operationDisplay.innerText = '';
+                    }
+
+                    stringNumber += number.innerHTML;
+                    numberDisplay.innerText = stringNumber;
+                });
+            });
+
+            // Event Listeners for the operative buttons of the calculator
+            operatives.forEach(operative => 
+            {
+                operative.addEventListener('click', () => 
+                {
+                    if(stringNumber.length > 0) 
+                    {
+                        if(!finished)
+                            operation.push(stringNumber);
+                        operation.push(operative.innerHTML);
+                        stringNumber = '';
+                        finished = false;
+                    }
+                    operationDisplay.innerText = operation.join(' ');
+                    numberDisplay.innerText = 0;
+                });
+            });
+
+            // Event Listeners for the action buttons of the calculator
+            actions.forEach(action => 
+            {
+                action.addEventListener('click', () => 
+                {
+                    if(finished)
+                    {
+                        operation.splice(0, operation.length)
+                        stringNumber = '';
+                    }
+                    else if(action.innerText === 'C')
+                    {
+                        operation.splice(0, operation.length)
+                        stringNumber = '';
+                    }
+                    else if(action.innerText === 'CE')
+                        stringNumber = '';
+                        
+                    finished = false;
+
+                    operationDisplay.innerText = operation.join(' ');
+                    numberDisplay.innerText = 0;
+                });
+            });
+
+            // Event Listeners for the separator button of the calculator
+            separator.addEventListener('click', () => 
+            {
+                if(!stringNumber.includes('.')) stringNumber += '.';
+                numberDisplay.innerText = stringNumber;
+            });
+
+            // Event Listeners for submiting the operation
+            const submit = document.querySelector('.submit');
+            submit.addEventListener('click', () => 
+            {
+                operation.push(stringNumber);
+                finished = true;
+
+                operationDisplay.innerText = operation.join(' ') + " =";
+                numberDisplay.innerText = eval(operation.join(""));
+            });
+        </script>
+    </body>
+</html>
