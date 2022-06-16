@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Random meal</title>
+        <meta name="description" content="JS Project used for finding random meal">
+        <meta name="keywords" content="meal, food, project, portfolio">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="dominz2005">
+        <link rel="icon" href="icons/food.png">
+        <style>
+            body
+            {
+                margin: 0;
+                padding: 0;
+                background-color: #fafafa;
+                font-family: "Kumbh Sans", sans-serif;
+            }
+            main
+            {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            main .randomizer
+            {
+                margin-top: 100px;
+                padding-bottom: 100px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                width: 60vw;
+                border-bottom: 1px solid #BFBFBF;
+            }
+            main .randomizer h1
+            {
+                margin: 0;
+                padding: 0;
+                text-align: center;
+                font-size: 60px;
+            }
+            main .randomizer p
+            {
+                margin: 0;
+                margin-top: 15px;
+                padding: 0;
+                text-align: center;
+                font-size: 16px;
+                color: #ED5424;
+            }
+            main .randomizer button
+            {
+                cursor: pointer;
+                margin-top: 10px;
+                margin-inline: auto;
+                padding: 6px 30px;
+                background-color: transparent;
+                border: 1px solid #ED5424;
+                border-radius: 5px;
+                font-size: 15px;
+                font-weight: 600;
+                color: #ED5424;
+                transition: .2s;
+            }
+            main .randomizer button:hover
+            {
+                background-color: #ED5424;
+                color: #fafafa;
+            }
+            main .randomizer button:active
+            {
+                background-color: #ef3800;
+                color: #fafafa;
+            }
+            main .meal
+            {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 100px;
+                width: 50vw;
+            }
+            main .meal h2
+            {
+                margin: 0;
+                padding: 0;
+                text-align: center;
+                font-size: 50px;
+            }
+            main .meal > p
+            {
+                margin: 0;
+                margin-top: 10px;
+                padding: 0;
+                text-align: center;
+                font-size: 17px;
+                color: #BFBFBF;
+            }
+            main .meal a
+            {
+                margin: 50px 0 20px 0;
+                display: inline-block;
+                text-align: center;
+                font-size: 18px;
+                color: #ED5424;
+            }
+            main .meal img 
+            { 
+                width: 100%;
+                margin-bottom: 70px;
+            }
+            main .meal div { width: 100% }
+            main .meal div h3
+            {
+                font-weight: 500;
+                font-size: 30px;
+            }
+            main .video
+            {
+                margin-top: 90px;
+                position: relative;
+                padding-top: 56.25%;
+            }
+            main .video iframe
+            {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 100%;
+            }
+
+            @media only screen and (max-width: 850px) 
+            {
+                main .randomizer { width: 100vw } 
+                main .meal { width: 90vw } 
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="randomizer">
+                <h1>Food Randomizer</h1>
+                <p>press button bellow to get random meal</p>
+                <button>Random meal</button>
+            </div>
+            <div class="meal" style="display: none;">
+                <h2></h2>
+                <p class="category"></p>
+                <p class="tags"></p>
+                <a href="" target="_blank"></a>
+                <img src="" alt="">
+                <div class="ingredients">
+                    <h3>Ingredients</h3>
+                    <ul></ul>
+                </div>
+                <div class="instructions">
+                    <h3>Instructions</h3>
+                    <p></p>
+                </div>
+                <div class="video">
+                    <iframe src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </main>
+        <script>
+            // Button click event for seaching random meal
+            const button = document.querySelector('button');
+            button.addEventListener('click', () =>
+            {
+                // Random meal API url
+                const url = "https://www.themealdb.com/api/json/v1/1/random.php";
+                fetch(url)
+                .then(res => res.json())
+                .then(data => SetMeal(data.meals[0]))
+                .catch(err => console.log(err));
+            });
+
+            // Function for setting meal elements
+            const meal = document.querySelector('.meal');
+            function SetMeal(data)
+            {
+                meal.style.display = 'flex';
+
+                // Seting meal title
+                const name = meal.querySelector('h2');
+                name.innerText = data.strMeal;
+
+                // Seting meal category
+                const category = meal.querySelector('.category');
+                category.innerHTML = `<b>${data.strArea}:</b> ${data.strCategory}`;
+
+                // Seting meal tags
+                const tags = meal.querySelector('.tags');
+                tags.innerText = data.strTags != null ? data.strTags.replaceAll(',', ', ') : 'No tags';
+
+                // Seting meal source
+                const source = meal.querySelector('a');
+                source.innerText = data.strSource != "" ? data.strSource : 'No source';
+                source.href = data.strSource != "" ? data.strSource : '#';
+
+                // Seting meal image
+                const img = meal.querySelector('img');
+                img.src = data.strMealThumb;
+                img.alt = data.strMeal;
+                
+                // Seting meal ingredients
+                const ingredients = meal.querySelector('.ingredients > ul');
+                ingredients.innerHTML = "";
+                Object.entries(data).forEach(element => 
+                {
+                    const [key, value] = element;
+                    if(!key.includes('strIngredient') && !key.includes('strMeasure')) return;
+                    if(value === null || value.length <= 1) return;
+
+                    if(key.includes('strIngredient'))
+                    {
+                        const li = document.createElement('li');
+                        li.innerText = value;
+                        ingredients.appendChild(li);
+                    }
+                    else if(key.includes('strMeasure'))
+                    {
+                        const index = parseInt(key.replace('strMeasure', '')) - 1;
+                        console.log(index);
+
+                        const li = ingredients.children[index];
+                        li.innerText += ` (${value})`;
+                    }
+                });
+                
+                // Seting meal instructions
+                const instructions = meal.querySelector('.instructions > p');
+                instructions.innerText = data.strInstructions;
+
+                // Seting meal youtube video
+                const video = meal.querySelector('.video > iframe');
+                video.src = data.strYoutube.replace("https://www.youtube.com/watch?v=", "https://www.youtube.com/embed/");
+            }
+        </script>
+    </body>
+</html>
